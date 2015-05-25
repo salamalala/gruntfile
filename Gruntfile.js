@@ -70,22 +70,45 @@ module.exports = function(grunt){
           expand: true,                  // Enable dynamic expansion
           cwd: 'assets/src/images/',                   // Src matches are relative to this path
           src: ['**/*.{png,jpg,gif,svg}'],   // Actual patterns to match
-          dest: 'assets/dist/images'                  // Destination path prefix
+          dest: 'assets/src/images'                  // Destination path prefix
         }]
       }
     },
+    responsive_images: {
+      myTask: {
+            options: {
+              sizes: [{
+                width: 320,
+              },{
+                name: 'large',
+                width: 640
+              },{
+                name: "large",
+                width: 1024,
+                suffix: "_x2",
+                quality: 60
+              }]
+            },
+          files: [{
+            expand: true,
+            cwd: 'assets/src/images',
+            src: ['**/*.{jpg,gif,png}'],
+            dest: 'assets/dist/images'
+          }]
+        }
+      },
 
     watch:{
       js:{
-        files: ['assets/dist/js/*.js'],
+        files: ['assets/src/js/*.js'],
         tasks:['uglify:js'],
         options:{
           livereload: true,
         }
       },
-      css:{
-        files:['assets/dist/css/*.css'],
-        tasks: ['sass:dist', 'cssmin', 'autoprefixer:main'],
+      sass:{
+        files:['**/*.scss'],
+        tasks: ['sass', 'autoprefixer', 'cssmin'],
         options:{
           livereload: true,
         }
@@ -102,7 +125,7 @@ module.exports = function(grunt){
 
   // Default Task
   
-  grunt.registerTask('serve',['connect', 'newer:uglify:js', 'bower_concat:all', 'newer:sass:dist', 'newer:autoprefixer', 'newer:cssmin:target',  'newer:imagemin', 'watch']);
+  grunt.registerTask('default',['connect', 'newer:uglify:js', 'bower_concat:all', 'sass', 'autoprefixer', 'cssmin',  'newer:imagemin', 'newer:responsive_images', 'watch']);
 
 
 };
