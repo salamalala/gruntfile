@@ -1,6 +1,7 @@
 module.exports = function(grunt){
   // Project configuration
   grunt.initConfig({
+
     connect:{
       server:{
         options:{
@@ -33,7 +34,7 @@ module.exports = function(grunt){
         }
       } 
     },
-    sass: {                            
+    sass: {                          
       dist: {
        files: [{
          expand: true,
@@ -70,48 +71,68 @@ module.exports = function(grunt){
           expand: true,                  // Enable dynamic expansion
           cwd: 'assets/src/images/',                   // Src matches are relative to this path
           src: ['**/*.{png,jpg,gif,svg}'],   // Actual patterns to match
-          dest: 'assets/src/images'                  // Destination path prefix
+          dest: 'assets/dist/images'                  // Destination path prefix
         }]
       }
     },
     responsive_images: {
       myTask: {
-            options: {
-              sizes: [{
-                width: 320,
-              },{
-                name: 'large',
-                width: 640
-              },{
-                name: "large",
-                width: 1024,
-                suffix: "_x2",
-                quality: 60
-              }]
-            },
-          files: [{
-            expand: true,
-            cwd: 'assets/src/images',
-            src: ['**/*.{jpg,gif,png}'],
-            dest: 'assets/dist/images'
+        options: {
+          sizes: [{
+            width: 320,
+          },{
+            name: 'large',
+            width: 640
+          },{
+            name: "large",
+            width: 1024,
+            suffix: "_x2",
+            quality: 60
           }]
+        },
+        files: [{
+          expand: true,
+          cwd: 'assets/src/images',
+          src: ['**/*.{jpg,gif,png}'],
+          dest: 'assets/dist/images'
+        }]
+      }
+    },
+    browserSync: {
+      dev: {
+        bsFiles: {
+          src : [
+          'assets/dist/**/*.css',
+          '*.php'
+          ]
+        },
+        options: {
+          proxy: "http://localhost/wordpress",
+          watchTask: true,
         }
-      },
-
+      }
+    },
     watch:{
       js:{
         files: ['assets/src/js/*.js'],
         tasks:['uglify:js'],
-        options:{
-          livereload: true,
-        }
+        // options:{
+        //   livereload: true,
+        // }
       },
       sass:{
         files:['**/*.scss'],
-        tasks: ['sass', 'autoprefixer', 'cssmin'],
-        options:{
-          livereload: true,
-        }
+        tasks: ['sass:dist', 'autoprefixer:main', 'cssmin:target'],
+        // options:{
+        //   livereload: true,
+        // }
+      },
+      images:{
+        files:['assets/src/images/*.{jpg,gif,png}'],
+        tasks: ['imagemin', 'responsive_images'],
+        // options:{
+        //   livereload: true,
+        // }
       }
     }
 
@@ -125,7 +146,9 @@ module.exports = function(grunt){
 
   // Default Task
   
-  grunt.registerTask('default',['connect', 'newer:uglify:js', 'bower_concat:all', 'sass', 'autoprefixer', 'cssmin',  'newer:imagemin', 'newer:responsive_images', 'watch']);
+  grunt.registerTask('default',['newer:uglify:js', 'bower_concat:all', 'newer:sass:dist','newer:autoprefixer', 'cssmin:target',  'newer:imagemin', 'browserSync', 'watch']);
+
+
 
 
 };
